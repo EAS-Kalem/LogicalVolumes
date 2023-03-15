@@ -1,0 +1,38 @@
+- name: Linux commands
+  when: ansible_system == "Linux"
+  block:
+    # - name: Install DNF
+    #   command: yum install dnf
+
+    # - name: Install LVM2
+    #   command: dnf install lvm2
+
+    # - name: Create PV on disk
+    #   command: pvcreate /dev/{{create_lv.pv_disk}} -ff
+
+    # - name: Verify PV status run
+    #   command: pvdisplay /dev/{{create_lv.pv_disk}}
+
+    # - name: Create VG with PV
+    #   command: vgcreate {{create_lv.vg_name}} /dev/{{create_lv.pv_disk}}
+
+    # - name: Verify VG status run
+    #   command: pvdisplay {{create_lv.vg_name}}
+
+    - name: Create LV from VG
+      command: lvcreate -L {{create_lv.lv_size}} -n {{create_lv.lv_name}} {{create_lv.vg_name}}
+
+    - name: Verify LV status run
+      command: pvdisplay /dev/{{create_lv.vg_name}}/{{create_lv.lv_name}}
+
+    - name: Format LVM Partition
+      command: mkfs.{{create_lv.lvm_partition_fs}} /dev/{{create_lv.vg_name}}/{{create_lv.lv_name}}
+
+    - name: Create mount folder
+      command: mkdir {{create_lv.mount_folder_path}}
+
+    - name: Mount LVM partition permanently
+      command: echo '/dev/{{create_lv.vg_name}}/{{create_lv.lv_name}} {{create_lv.mount_folder_path}} {{create_lv.lvm_partition_fs}} default 0 0' | tee -a /etc/fstab
+
+    - name: Mount /etc/fstab
+      command: mount -a

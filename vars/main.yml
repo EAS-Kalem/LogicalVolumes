@@ -1,0 +1,8 @@
+---
+create_lv:
+  # pv_disk: sda3
+  vg_name: volgrp
+  lv_name: lv09
+  lv_size: 14g
+  lvm_patition_fs: xfs
+  mount_folder_path: /mnt/data
